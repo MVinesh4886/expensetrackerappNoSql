@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Login</title>
+  </head>
+  <link rel="stylesheet" href="./Login.css" />
+  <body>
+    <form onsubmit="loginUser(event)">
+      <div class="form">
+        <h1 id="login">LOGIN USER</h1>
+
+        <div>
+          <label class="label" for="email">REGISTERED EMAIL</label>
+          <input
+            class="input-field"
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter email"
+            required
+          />
+        </div>
+        <div>
+          <label class="label" for="password">PASSWORD</label>
+          <input
+            class="input-field"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter Password"
+            required
+          />
+        </div>
+        <div class="bottom">
+          <button type="submit" id="loginBtn">
+            LOGIN NOW <a href="./Expense.html"></a>
+          </button>
+          <button type="button" id="forgotPassword">FORGOT PASSWORD ?</button>
+        </div>
+      </div>
+    </form>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      async function loginUser(event) {
+        event.preventDefault();
+        const emailId = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const response = await axios.post(
+            "http://localhost:8000/user/login",
+            {
+              emailId,
+              password,
+            }
+          );
+          // console.log(response.data);
+          alert(response.data.message);
+          // console.log(response.data.token);
+          if (response.data.token === undefined) {
+            alert("Please enter valid credentials");
+          } else {
+            localStorage.setItem(
+              "userDetails",
+              JSON.stringify(response.data.token)
+            );
+            window.location.href = "./Expense.html";
+          }
+        } catch (error) {
+          console.log(error);
+          alert(response.data.message);
+        }
+      }
+
+      const forgotPasswordButton = document.getElementById("forgotPassword");
+
+      forgotPasswordButton.addEventListener("click", async () => {
+        const emailId = document.getElementById("email").value;
+
+        // Check if the email field is empty
+        if (emailId === "") {
+          alert("Please enter your email first");
+          return;
+        }
+
+        try {
+          // Send a POST request to the backend to initiate the password reset process
+          const response = await axios.post(
+            "http://localhost:8000/user/forgotPassword",
+            {
+              emailId,
+            }
+          );
+
+          console.log(response.data); // Email sent successfully
+          alert("Check your email");
+        } catch (error) {
+          // Error message from the backend
+          console.log(error);
+        }
+      });
+    </script>
+  </body>
+</html>
